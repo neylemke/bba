@@ -93,10 +93,40 @@ assocvarnamesTex=<|
 "DROGAS30"->"LB:DROGAS30",
 "DROGAS12"->"LB:DROGAS12",
 "z6AUDITC"->"6:AUDITC",
-"z6AUDITESC"->"6:AUDITESC",
+"z6AUDITESC"->"6:AUDIT",
 "z6DROGAS30"->"6:DROGAS30",
 "z12AUDITC"->"12:AUDITC",
-"z12AUDITESC"->"12:AUDITESC",
+"z12AUDITESC"->"12:AUDIT",
+"z12DROGAS30"->"12:DROGAS30",
+"DROGAS30BIT"->"LB:DROGAS30",
+"DROGAS12BIT"->"LB:DROGAS12",
+"z6DROGAS30BIT"->"6:DROGAS30",
+"z12DROGAS30BIT"->"12:DROGAS30",
+"1"->"Constante",
+"CLASSE"->"Classe Social"
+|>;
+
+assocvarnamesShortTex=<|
+"SEXO"->"Sexo",
+"SEXOS"->"Sexos",
+"AUDITC"-> "AUDITC",
+"AUDITESC"->"AUDIT",
+"CATIDADEBEB"-> "Idade que iniciou a beber",
+"DROGAS12"-> "Drogas no Ano",
+"RELIGI"->"Prefer\\^encia Religiosa",
+"RELIGIPR"->"Pr\\'atica da Religi\\~ao",
+"RACA"->"Ra\\c{c}a",
+"IDADEBEB"-> "Idade Primeiro Consumo",
+"FAMILAL"->"Fam\\'{\\i}lia com Consumo de Risco",
+"AMBINGE"->"Amigos que Tomam Porres",
+"INSTRCHE"->"Instru\\c{c}\\~ao do Chefe",
+"DROGAS30"->"LB:DROGAS30",
+"DROGAS12"->"DROGAS12",
+"z6AUDITC"->"6:AUDITC",
+"z6AUDITESC"->"6:AUDIT",
+"z6DROGAS30"->"6:DROGAS30",
+"z12AUDITC"->"12:AUDITC",
+"z12AUDITESC"->"12:AUDIT",
 "z12DROGAS30"->"12:DROGAS30",
 "DROGAS30BIT"->"LB:DROGAS30",
 "DROGAS12BIT"->"LB:DROGAS12",
@@ -136,6 +166,8 @@ assocvarnames=<|
 "1"->"Constante",
 "CLASSE"->"Classe Social"
 |>;
+
+associnstr=<|0->0,1->1,2->4,3->8|>;
 
 
 classeE=Interval[{0,7}];
@@ -203,7 +235,7 @@ gerapart[part1_,var_]:=Normal[part1[All,var]]/.Times[x_,""]->x
 
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Fun\[CCedilla]\[OTilde]es Estat\[IAcute]sticas*)
 
 
@@ -332,12 +364,11 @@ header="
 \\toprule
  &  \\multicolumn{5}{c}{ Vari\'aveis S\'ocio Demogr\'aficas "<>geraSize[
 tabci[[1,-1,-1,2,1,1]]]<>"} \\\\
-\\cmidrule(r){2-6} 
 & & \\multicolumn{2}{c}{C}&
  \\multicolumn{2}{c}{I}  \\\\\n
 \\cmidrule(r){3-4} \\cmidrule(r){5-6}
-& &   \\multicolumn{2}{c}{Estat\\'\\i stica} & 
-      \\multicolumn{2}{c}{Estat\\'\\i stica}  \\\\\n
+%& &   \\multicolumn{2}{c}{Estat\\'\\i stica} & 
+%      \\multicolumn{2}{c}{Estat\\'\\i stica}  \\\\\n
 \\cmidrule(r){3-4} \\cmidrule(r){5-6} 
  & & $N$ & $\\%$ & $N$ & $\\%$ \\\\\n  \\midrule 
 ";
@@ -363,9 +394,9 @@ tabci[[1,-1,-1,2,1,1]]+tabci[[1,-1,-1,2,2,1]]]<>"} \\\\
 \\cmidrule(r){2-6} 
 & & \\multicolumn{2}{c}{"<>gnames[[1]]<>"}&
  \\multicolumn{2}{c}{"<>gnames[[2]]<>"}  \\\\\n
-\\cmidrule(r){3-4} \\cmidrule(r){5-6}
-& &   \\multicolumn{2}{c}{Estat\\'\\i stica} & 
-      \\multicolumn{2}{c}{Estat\\'\\i stica}  \\\\\n
+%\\cmidrule(r){3-4} \\cmidrule(r){5-6}
+%& &   \\multicolumn{2}{c}{Estat\\'\\i stica} & 
+%      \\multicolumn{2}{c}{Estat\\'\\i stica}  \\\\\n
 \\cmidrule(r){3-4} \\cmidrule(r){5-6} 
  & & $N$ & $\\%$ & $N$ & $\\%$ \\\\\n  \\midrule 
 ";
@@ -389,19 +420,19 @@ geratabfisio[partlsd_,lisvarfisio_]:=Module[{listemp},Table[{lisvarfisio[[i,2]],
 ]
 
 
-geratabfisioTex[tabci_,prec_]:=Module[{stringtable},
+geratabfisioTex[tabci_,veclen_,prec_]:=Module[{stringtable},
 stringtable="% Gerado por " <>NotebookFileName[EvaluationNotebook[]] <>" em "<> ToString[DateValue["Day"]]<>"/"<>ToString[DateValue["Month"]]<>"/"<>ToString[DateValue["Year"]]<>"\n
 \\begin{tabular}{lrrrrrr}
 \\toprule
-  &   \\multicolumn{6}{c}{ Vari\[AAcute]veis Fisiol\[OAcute]gicas " <>geraSize[Length[partlsd[[1]]]+Length[partlsd[[2]]]+Length[partlsd[[3]]]]<> "
+  &   \\multicolumn{6}{c}{ Vari\[AAcute]veis antropom\[EAcute]tricas " <>geraSize[Length[partlsd[[1]]]+Length[partlsd[[2]]]+Length[partlsd[[3]]]]<> "
 } \\\\
 \\cmidrule(r){2-7} 
-&   \\multicolumn{2}{c}{BR} " <>geraSize[Length[partlsd[[1]]]]<>" & \\multicolumn{2}{c}{C }"<>geraSize[Length[partlsd[[2]]]]<>"&
- \\multicolumn{2}{c}{I } " <>geraSize[Length[partlsd[[3]]]]<> " \\\\ \n
+&   \\multicolumn{2}{c}{BR} " <>geraSize[veclen[[1]]]<>" & \\multicolumn{2}{c}{C }"<>geraSize[veclen[[2]]]<>"&
+ \\multicolumn{2}{c}{IB } " <>geraSize[veclen[[3]]]<> " \\\\ \n
 \\midrule 
-&   \\multicolumn{2}{c}{Estat\\'\\i stica} & \\multicolumn{2}{c}{Estat\\'\\i stica}&
-      \\multicolumn{2}{c}{Estat\\'\\i stica}  \\\\\n
-\\cmidrule(r){2-3} \\cmidrule(r){4-5} \\cmidrule(r){6-7}
+%&   \\multicolumn{2}{c}{Estat\\'\\i stica} & \\multicolumn{2}{c}{Estat\\'\\i stica}&
+%      \\multicolumn{2}{c}{Estat\\'\\i stica}  \\\\\n
+%\\cmidrule(r){2-3} \\cmidrule(r){4-5} \\cmidrule(r){6-7}
       &  \\multicolumn{1}{c}{$\\mu$} & \\multicolumn{1}{c}{$\\sigma$} &  \\multicolumn{1}{c}{$\\mu$}& \\multicolumn{1}{c}{$\\sigma$} &  \\multicolumn{1}{c}{$\\mu$} & \\multicolumn{1}{c}{$\\sigma$}\\\\\n  \\midrule 
 ";
 stringtable=stringtable<>Table[tabci[[j,1]]<>Table[" &"<>geraNumTex[tabci[[j,2,k,1]],prec]<>"& "<>geraNumTex[tabci[[j,2,k,2]],2],{k,1,3}]<>"\\\\\n",{j,1,Length[tabci]}];
@@ -415,7 +446,8 @@ corrigeAcentos[stringtable]
 geracorrtabTex[corrTab_,corrTabTeste_,lisvar_]:=Module[{headerString,colString,stringtable},
 headerString=StringJoin[ " & "<> #&/@ assocvarnames/@lisvar]<>"\\\\\n \\midrule\n ";
 colString="l|"<>StringJoin[Table["c",{i,1,Length[corrTab]}]];
-stringtable="\n\n\\begin{tabular}{"<>colString<>"}\n\\toprule\n"<> 
+header="\n\n\\begin{tabular}{"<>colString<>"}\n\\toprule\n";
+stringtable=
 headerString<>StringJoin[Table[StringJoin[" "<> assocvarnames[lisvar[[j]]],
  Table[" & \\nprounddigits{2}"<>If[ corrTabTeste[[i,j]]>0.05,
 "\\numprint{"<>ToString[CForm[corrTab[[i,j]]]],"{\\bf \\numprint{ "<> 
@@ -462,7 +494,7 @@ geralinha[data_,str_,total_]:=Prepend[Flatten[{gerapar[data,#SEXOS=="F"&],gerapa
 
 
 
-geraTabPart[tabci_,titulo_,prec_]:=Module[{stringtable,comment,header,footer,lis1},header="\\begin{tabular}{lrrrrrr}
+(* geraTabPart[tabci_,titulo_,prec_]:=Module[{stringtable,comment,header,footer,lis1},header="\\begin{tabular}{lrrrrrr}
        \\toprule
 &\\multicolumn{6}{c}{"<>titulo<>" (N = " <> ToString[tabci[[-1,-2]]]<>")} \\\\
 \\midrule
@@ -475,6 +507,22 @@ tabci[[i,1]]<>" & "<>concTex[lis1]<>"\n",{i,1,Length[tabci]}]
 ];
 stringtable=corrigeAcentos[stringtable];
 geraTable[header,stringtable]]
+*)
+
+geraTabPart[tabci_,titulo_,prec_]:=Module[{stringtable,comment,header,footer,lis1},header="\\begin{tabular}{lrrrrrr}
+       \\toprule
+&\\multicolumn{6}{c}{"<>titulo<>"}\\\\
+\\midrule
+        & \\multicolumn{2}{c}{Mulheres} & \\multicolumn{2}{c}{Homens} & \\multicolumn{2}{c}{Total} \\\\
+       \\cmidrule(r){2-3}  \\cmidrule(r){4-5}  \\cmidrule(r){6-7} 
+       & N & \% & N & \% & N & \%  \\\\\n  \\midrule \n";
+stringtable=StringJoin[Table[
+lis1=geraNumTex[#,prec]&/@tabci[[i,2;;-1]];
+tabci[[i,1]]<>" & "<>concTex[lis1]<>"\n",{i,1,Length[tabci]}]
+];
+stringtable=corrigeAcentos[stringtable];
+geraTable[header,stringtable]]
+
 
 
 geraTabHelper[tabci_,titulo_,prec_]:=Module[{header,stringtable,lis1},
@@ -554,7 +602,7 @@ header="\\midrule
        \\cmidrule(r){2-3}  \\cmidrule(r){4-5}  \\cmidrule(r){6-7} 
        & N & \% & N & \% & N & \%  \\\\\n  \\midrule \n";
 stringtable=StringJoin[Table[
-lis1=geraNumTex[#,prec]&/@tabci[[i,2;;-1]];
+lis1=geraNumTexFull[#,prec]&/@tabci[[i,2;;-1]];
 tabci[[i,1]]<>" & "<>concTex[lis1]<>"\n",{i,1,Length[tabci]}]
 ];
 header<>stringtable
@@ -664,14 +712,14 @@ ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},FrameLabel->{"", Style[assocva
 Epilog-> {pos2,Inset[Framed[Style[gnames[[2]],14]],{11.42,maxplot},{Right,Top}],
 Inset[Framed[Style[gnames[[1]],14]],{2.025,maxplot},{Left,Top}],{Dashed,Line[{{6.5,-0.75},{6.5,maxplot+1}}]}}]
 ]
-geraGraficoAttrition[var_,maxplot_]:=
+geraGraficoAttrition[var_,part2_,maxplot_]:=
 BoxWhiskerChart[{Normal[part2["F", "True"][All,var]],
 Normal[part2["M","True"][All,var]],
 Normal[part2["F","False"][All,var]],
 Normal[part2["M","False"][All,var]]},
 ChartLabels->{"Completo","Abandono","Completo","Abandono"},
 ChartStyle->{ColorData["Rainbow"][0.95],ColorData["Rainbow"][0.85],
-ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},FrameLabel->{"", Style[var,18]}]
+ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},FrameLabel->{"", Style[assocvarnamesShortTex@var,18]}]
 
 
 
@@ -681,7 +729,7 @@ ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},Fram
 (**)
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Fun\[CCedilla]\[OTilde]es Auxiliares LaTeX*)
 
 
@@ -738,8 +786,8 @@ Import[prefix<>"temp.png"]
 
 
 
-(* ::Section:: *)
-(*Fun\[CCedilla]\[OTilde]es de Simula\[CCedilla]\[ATilde]o do Modelo pqq*)
+(* ::Section::Closed:: *)
+(*Fun\[CCedilla]\[OTilde]es para Simula\[CCedilla]\[ATilde]o do Modelo pqq*)
 
 
 Clear[sumpartial];
