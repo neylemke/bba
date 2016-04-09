@@ -56,9 +56,9 @@ hashlsd["AUDIT11"]={
 {4,"4 ou mais vezes por semana"}};
 
 hashlsd["CATIDADEBEB"]={
-{0,"$<$12"} ,
+{0,"$<$13"} ,
 {1,"$[13,14]$"},
-{2, "$\\geq$ 15"}};
+{2, "$>$ 14"}};
 
 hashaoc[0]="0 doses";
 hashaoc[1]="1 ou 2 doses";
@@ -88,7 +88,7 @@ assocvarnamesTex=<|
 "RACA"->"Ra\\c{c}a",
 "IDADEBEB"-> "Idade Primeiro Consumo",
 "FAMILAL"->"Fam\\'{\\i}lia com Consumo de Risco",
-"AMBINGE"->"Amigos que Tomam Porres",
+"AMBINGE"->"Amigos que se Embriagam",
 "INSTRCHE"->"Instru\\c{c}\\~ao do Chefe",
 "DROGAS30"->"LB:DROGAS30",
 "DROGAS12"->"LB:DROGAS12",
@@ -118,7 +118,7 @@ assocvarnamesShortTex=<|
 "RACA"->"Ra\\c{c}a",
 "IDADEBEB"-> "Idade Primeiro Consumo",
 "FAMILAL"->"Fam\\'{\\i}lia com Consumo de Risco",
-"AMBINGE"->"Amigos que Tomam Porres",
+"AMBINGE"->"Amigos que se Embriagam",
 "INSTRCHE"->"Instru\\c{c}\\~ao do Chefe",
 "DROGAS30"->"LB:DROGAS30",
 "DROGAS12"->"DROGAS12",
@@ -149,7 +149,7 @@ assocvarnames=<|
 "RACA"->"Ra\[CCedilla]a",
 "IDADEBEB"-> "Idade Primeiro Consumo",
 "FAMILAL"->"Fam\[IAcute]lia com Consumo de Risco",
-"AMBINGE"->"Amigos que Tomam Porres",
+"AMBINGE"->"Amigos que se Embriagam",
 "INSTRCHE"->"Instru\[CCedilla]\[ATilde]o do Chefe",
 "DROGAS30"->"LB:DROGAS30",
 "DROGAS12"->"LB:DROGAS12",
@@ -197,7 +197,8 @@ lispesos=(Partition[StringSplit[strclasses,{" ","\n"}],6])[[All,{2,3,4,5,6}]];
 lisbens={"ABIPEMET","ABIPEMEV","ABIPEMER","ABIPEMEW","ABIPEMEC","ABIPEMEE","ABIPEMEM","ABIPEMEG","ABIPEMEF"};
 
 listabbens=Transpose@Prepend[Transpose[lispesos],{"ABIPEMET","ABIPEMEV","ABIPEMER","ABIPEMEW","ABIPEMEC","ABIPEMEE","ABIPEMEM","ABIPEMEG","ABIPEMEF"}];
-Do[hashbens[listabbens[[i,1]]]=Rest[listabbens[[i]]],{i,1,Length[listabbens]}]
+(* Do[hashbens[listabbens[[i,1]]]=Rest[listabbens[[i]]],{i,1,Length[listabbens]}]*) 
+Do[hashbens[First@bens]=Rest[bens],{bens,listabbens}]
 
 
 
@@ -227,7 +228,7 @@ errorBar[orig_,fim_]:={Arrowheads[{{.01,1,bar}}],Arrow[{{orig,fim}}],Arrow[{fim,
 bar=Graphics[Line[{{0,-1},{0,1}}]];
 
 
-gerapart[part1_,var_]:=Normal[part1[All,var]]/.Times[x_,""]->x
+gerapart[part1_,var_]:=DeleteMissing@Normal[part1[All,var]]
 
 
 
@@ -235,7 +236,7 @@ gerapart[part1_,var_]:=Normal[part1[All,var]]/.Times[x_,""]->x
 
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Fun\[CCedilla]\[OTilde]es Estat\[IAcute]sticas*)
 
 
@@ -315,9 +316,10 @@ geraTabCG[tabci_,prec_]:=Module[{stringtable,comment,header,footer},header="\\be
 stringtable=StringTemplate["Mulheres  `liswoman` \\\\\n Homens `lisman` \\\\\n"][<|"liswoman"->StringJoin[Table[" &"<>geraNumTex[tabci[[1,i]],prec],{i,1,Length[tabci[[2]]]}]],"lisman"->StringJoin[Table[" &"<>geraNumTex[tabci[[2,i]],prec],{i,Length[tabci[[2]]]}]]|>];
 geraTable[header,stringtable]]
 
-geratabmd[part1_,varwaves_]:=Module[{lis},Table[{lis=gerapart[part1[[i]],#];N[Mean[lis]],N[StandardDeviation[lis]]},{i,1,4}]&/@varwaves]
+geratabmd[part1_,varwaves_]:=Module[{lis},
+Table[{lis=gerapart[part1[[i]],#];N[Mean[lis]],N[StandardDeviation[lis]]},{i,1,4}]&/@varwaves]
 
-geratabMDTex[tabci_,var_,gnames_,prec_]:=Module[{stringtableC,stringtableI},header="   \\begin{tabular}{llrrrrrr}
+geratabMDTex[tabci_,var_,gnames_,prec_]:=Module[{stringtableC,stringtableI,header},header="   \\begin{tabular}{llrrrrrr}
         \\toprule
           &  & \\multicolumn{6}{c}{"<>var<>"} \\\\
         \\cmidrule(r){3-8} 
@@ -346,7 +348,7 @@ funclsd[lis_]:=Module[{tallylis},
 tallylis=Transpose[Sort[Tally[Normal[lis]]]];
 Transpose[Append[tallylis,(tallylis/.{x_,y_}->N[y/Length[lis]*100])]]]
 
-geratablsd[partlsd_,lisvar_]:=Module[{listemp,listemp2,count},Table[{
+(* geratablsd[partlsd_,lisvar_]:=Module[{listemp,listemp2,count},Table[{
 lisvar[[j]],
 listemp=hashlsd[lisvar[[j]]];
 Append[Table[{Last[listemp[[i]]],
@@ -355,8 +357,19 @@ First[listemp[[i]]]],100*N[count/Length[listemp2]]},{k,1,Length[partlsd]}]},
 {i,1,Length[listemp]}],
 {"Total",Table[ 
 {Length[Normal[partlsd[[k]][All,lisvar[[j]]]]],100},{k,1,Length[partlsd]}]} ]},{j,1,Length[lisvar]}]]
+*)
 
-geratablsdTex[tabci_,prec_]:=Module[{stringtable,len},
+geratablsd[partlsd_,lisvar_]:=Module[{listemp,listemp2,count},Table[{
+var,
+listemp=hashlsd[var];
+Append[Table[{Last[temp],
+Table[{count=Count[listemp2=Normal[partlsd[Key[key]][All,var]],
+First[temp]],100*N[count/Length[listemp2]]},{key,Normal@Keys@partlsd}]},
+{temp,listemp}],
+{"Total",Table[ 
+{Length[Normal[partlsd[Key[key]][All,var]]],100},{key,Normal@Keys@partlsd}]} ]},{var,lisvar}]]
+
+geratablsdTex[tabci_,prec_]:=Module[{stringtable,len,header},
 header="
 \\small{
 \\renewcommand{\\arraystretch}{0.5}
@@ -416,7 +429,9 @@ geraTable[header,stringtable]<>"}"
 
 
 
-geratabfisio[partlsd_,lisvarfisio_]:=Module[{listemp},Table[{lisvarfisio[[i,2]],Table[{listemp=N[Select[Normal[partlsd[[k]][All,lisvarfisio[[i,1]]]],NumberQ]];Mean[listemp],StandardDeviation[listemp]},{k,1,Length[partlsd]}]},{i,1,Length[lisvarfisio]}]
+geratabfisio[partlsd_,lisvarfisio_]:=Module[{listemp},Table[{lisvarfisio[[i,2]],
+Table[{listemp=N[Select[Normal[partlsd[[k]][All,lisvarfisio[[i,1]]]],NumberQ]];
+Mean[listemp],StandardDeviation[listemp]},{k,1,Length[partlsd]}]},{i,1,Length[lisvarfisio]}]
 ]
 
 
@@ -490,24 +505,13 @@ geraTabAtt[tabci_,prec_]:=Module[{stringtable,comment,header,footer},header="\\b
 stringtable=StringTemplate["Mulheres  `liswoman` \\\\\n Homens `lisman` \\\\\n"][<|"liswoman"->StringJoin[Table[" &"<>geraNumTex[tabci[[1,i]],prec],{i,1,Length[tabci[[2]]]}]],"lisman"->StringJoin[Table[" &"<>geraNumTex[tabci[[2,i]],prec],{i,Length[tabci[[2]]]}]]|>];
 geraTable[header,stringtable]]
 
-geralinha[data_,str_,total_]:=Prepend[Flatten[{gerapar[data,#SEXOS=="F"&],gerapar[data,#SEXOS=="M"&],Length[Select[data,#SEXOS=="F"|| #SEXOS=="M"&]],N[100*Length[Select[data,#SEXOS=="F"|| #SEXOS=="M"&]]/total]}],str]
+geralinha[data_,str_,total_]:=Prepend[Flatten[{gerapar[data,#SEXOS=="F"&],
+gerapar[data,#SEXOS=="M"&],Length[Select[data,#SEXOS=="F"|| #SEXOS=="M"&]],
+N[100*Length[Select[data,#SEXOS=="F"|| #SEXOS=="M"&]]/total]}],str]
 
 
 
-(* geraTabPart[tabci_,titulo_,prec_]:=Module[{stringtable,comment,header,footer,lis1},header="\\begin{tabular}{lrrrrrr}
-       \\toprule
-&\\multicolumn{6}{c}{"<>titulo<>" (N = " <> ToString[tabci[[-1,-2]]]<>")} \\\\
-\\midrule
-        & \\multicolumn{2}{c}{Mulheres} & \\multicolumn{2}{c}{Homens} & \\multicolumn{2}{c}{Total} \\\\
-       \\cmidrule(r){2-3}  \\cmidrule(r){4-5}  \\cmidrule(r){6-7} 
-       & N & \% & N & \% & N & \%  \\\\\n  \\midrule \n";
-stringtable=StringJoin[Table[
-lis1=geraNumTex[#,prec]&/@tabci[[i,2;;-1]];
-tabci[[i,1]]<>" & "<>concTex[lis1]<>"\n",{i,1,Length[tabci]}]
-];
-stringtable=corrigeAcentos[stringtable];
-geraTable[header,stringtable]]
-*)
+
 
 geraTabPart[tabci_,titulo_,prec_]:=Module[{stringtable,comment,header,footer,lis1},header="\\begin{tabular}{lrrrrrr}
        \\toprule
@@ -550,11 +554,15 @@ geraTable[header,stringtable]]
 
 geratabtime[data_,varwaves_,varwavesnames_,varwavesnamess_]:=Module[{tt1,tt2,part1},
 part1=GroupBy[data,{#GRUPO,#SEXOS}&];
-tt1=Table[{varwavesnamess[[j]],{"C","I"},{"F","M","F","M"},Table[N[Mean[gerapart[part1[[i]],varwaves[[j]]]]],{i,1,4}]},{j,1,3}];
-tt2=Flatten[Table[{varwavesnamess[[j]]<>" $\\times$ "<>varwavesnamess[[k]],{"C","I"},{"F","M","F","M"},Table[LocationTest[{gerapart[part1[[i]],varwavesnames[[j]]],gerapart[part1[[i]],varwavesnames[[k]]]},0],{i,1,4}]},{k,2,3},{j,1,k-1}],1];
+tt1=Table[{varwavesnamess[[j]],{"C","I"},{"F","M","F","M"},
+Table[N[Mean[gerapart[part1[[i]],varwaves[[j]]]]],{i,1,4}]},{j,1,3}];
+tt2=Flatten[Table[{varwavesnamess[[j]]<>" $\\times$ "<>varwavesnamess[[k]],{"C","I"},
+{"F","M","F","M"},Table[LocationTest[{gerapart[part1[[i]],varwavesnames[[j]]],
+gerapart[part1[[i]],varwavesnames[[k]]]},0],{i,1,4}]},{k,2,3},{j,1,k-1}],1];
 Join[tt1,tt2]]
 
-geratabtimeTex[varname_,timetable_,prec_,statList_,gnames_,num_]:=Module[{temp,temp2,stringtable,lisfirst,strcols,header,len}, temp2=Transpose[timetable[[All,4]]];
+geratabtimeTex[varname_,timetable_,prec_,statList_,gnames_,num_]:=Module[{temp,temp2,stringtable,lisfirst,strcols,header,len}, 
+temp2=Transpose[timetable[[All,4]]];
 lisfirst={applyLatexCommand["\\multirow{2}{*}",gnames[[1]]],"", applyLatexCommand["\\multirow{2}{*}",gnames[[2]]],""}; 
 len=Length[timetable];
 strcols=StringJoin[Table["r",len]];
@@ -562,19 +570,22 @@ header="\n\\begin{tabular}{cc"<>strcols<>"}";
 stringtable="
 \\toprule\n
     & & "<>applyLatexCommand["\\multicolumn{6}{c}",varname  <>" "<> geraSize[num]]<>" \\\\  \\cmidrule(r){3-"<>ToString[len+2]<>"}
-   ";stringtable= stringtable<>"Grupos & Sexo"<>Table["& "<>applyLatexCommand["\\multicolumn{1}{c}",timetable[[All,1]][[i]]],{i,1,Length[timetable[[All,1]]]}]<>"\\\\\n";
+   ";
+stringtable= stringtable<>"Grupos & Sexo"<>Table["& "<>applyLatexCommand["\\multicolumn{1}{c}",timetable[[All,1]][[i]]],{i,1,Length[timetable[[All,1]]]}]<>"\\\\\n";
 stringtable= stringtable<>"& & "<>concTex[applyLatexCommand["\\multicolumn{1}{c}", #]&/@statList];
 stringtable=stringtable<>"\\midrule\n"<>StringJoin[Table[lisfirst[[j]]<>"&"<>If[EvenQ[j],"Homem","Mulher"]<>StringJoin[ Table[" & "<> geraNumTex[ temp2[[j,i]],prec],{i,1, Length[temp2[[j]]]}]]<>"\\\\ \n",{j,1,Length[temp2]}]];
 geraTable[header,stringtable]]
 
 geratabCG[data_,varwaves_,varwavesnames_,varwavesnamess_]:=Module[{bbaci,tt1,tt2},
 bbaci=data[GroupBy["SEXOS"],GroupBy["GRUPO"]];
-tt1=Table[{varwavesnamess[[j]],{"F","M"},{"I","C","I","C"},N[Mean[Normal[bbaci[#[[1]],#[[2]]][[All,varwaves[[j]]]]]]/.Times[x_,""]->x]&/@{{"F","I"},{"F","C"},{"M", "I"},{"M","C"}}},{j,1,3}];
-tt2=Table[{varwavesnamess[[k]],{"C","I"},{"F","M","F","M"},LocationTest[{Normal[bbaci[#,"C"][All,varwavesnames[[k]]]],Normal[bbaci[#,"I"][All,varwavesnames[[k]]]]}/.Times[x_,""]->x]&/@{"F","M"}},{k,1,3}];
+tt1=Table[{varwavesnamess[[j]],{"F","M"},{"I","C","I","C"},N[Mean[DeleteMissing@Normal[bbaci[#[[1]],#[[2]]][[All,varwaves[[j]]]]]]/.Times[x_,""]->x]&/@{{"F","I"},{"F","C"},{"M", "I"},{"M","C"
+}}},{j,1,3}];
+tt2=Table[{varwavesnamess[[k]],{"C","I"},{"F","M","F","M"},LocationTest[{DeleteMissing@Normal[bbaci[#,"C"][All,varwavesnames[[k]]]],DeleteMissing@Normal[bbaci[#,"I"][All,varwavesnames[[k]]]]}]&/@{"F","M"}},{k,1,3}];
 Join[tt1,tt2]
 ]
 
-geratabCGTex[varname_,timetable_,prec_,statList_,gnames_,num_]:=Module[{temp,temp2,stringtable,lisfirst,lislast,strcols,header,len}, temp2=Transpose[timetable[[1;;3,4]]];
+geratabCGTex[varname_,timetable_,prec_,statList_,gnames_,num_]:=Module[{temp,temp2,stringtable,lisfirst,lislast,strcols,header,len}, 
+temp2=Transpose[timetable[[1;;3,4]]]/.{a_,b_,c_,d_}->{b,a,d,c};
 lisfirst={"\\multirow{2}{*}{Mulher}","", "\\multirow{2}{*}{Homem}",""}; 
 lislast={"\\multirow{2}{*}{Mulher}","", "\\multirow{2}{*}{Homem}",""}; 
 len=Length[timetable];
@@ -708,9 +719,9 @@ ChartStyle->{ColorData["Rainbow"][0.95],ColorData["Rainbow"][0.9],
 ColorData["Rainbow"][0.85],ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.25],
 ColorData["Rainbow"][0.35],ColorData["Rainbow"][0.95],ColorData["Rainbow"][0.9],
 ColorData["Rainbow"][0.85],ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.25],
-ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},FrameLabel->{"", Style[assocvarnames[var],18]},
-Epilog-> {pos2,Inset[Framed[Style[gnames[[2]],14]],{11.42,maxplot},{Right,Top}],
-Inset[Framed[Style[gnames[[1]],14]],{2.025,maxplot},{Left,Top}],{Dashed,Line[{{6.5,-0.75},{6.5,maxplot+1}}]}}]
+ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot+5},FrameLabel->{"", Style[assocvarnames[var],18]},
+Epilog-> {pos2,Inset[Framed[Style[gnames[[2]],14]],{11.42,maxplot+4},{Right,Top}],
+Inset[Framed[Style[gnames[[1]],14]],{2.025,maxplot+4},{Left,Top}],{Dashed,Line[{{6.5,-0.75},{6.5,maxplot+6}}]}}]
 ]
 geraGraficoAttrition[var_,part2_,maxplot_]:=
 BoxWhiskerChart[{Normal[part2["F", "True"][All,var]],
@@ -719,7 +730,8 @@ Normal[part2["F","False"][All,var]],
 Normal[part2["M","False"][All,var]]},
 ChartLabels->{"Completo","Abandono","Completo","Abandono"},
 ChartStyle->{ColorData["Rainbow"][0.95],ColorData["Rainbow"][0.85],
-ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},FrameLabel->{"", Style[assocvarnamesShortTex@var,18]}]
+ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},
+FrameLabel->{"", Style[assocvarnamesShortTex@var,18]}]
 
 
 
@@ -729,7 +741,7 @@ ColorData["Rainbow"][0.2],ColorData["Rainbow"][0.3]},PlotRange->{0,maxplot},Fram
 (**)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Fun\[CCedilla]\[OTilde]es Auxiliares LaTeX*)
 
 
@@ -786,7 +798,7 @@ Import[prefix<>"temp.png"]
 
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Fun\[CCedilla]\[OTilde]es para Simula\[CCedilla]\[ATilde]o do Modelo pqq*)
 
 
